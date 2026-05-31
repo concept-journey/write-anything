@@ -41,6 +41,7 @@ Use `seeds/` for 글감 노트.
 - File name: 날짜-짧은-이름, for example `2026-05-31-writing-is-thinking.md`.
 - Start from `seeds/TEMPLATE.md`.
 - Include 처음 걸린 말, 왜 쓰고 싶었는지, 캐묻기 기록, 가능한 글의 모양.
+- When a 글 묶음 is created from this 글감, add it under 이어진 글 묶음.
 - 글감 can be 덜 정리돼도 된다.
 - A 글감 can split into several 글 묶음 or merge with other 글감.
 
@@ -50,7 +51,8 @@ Use `pieces/` for 마크다운 글.
 
 - File name: 날짜-짧은-이름.
 - Start from `pieces/TEMPLATE.md`.
-- Include 열어보고 싶은 제목, 핵심 문장, 정리된 글, and 건네는 말.
+- Include 열어보고 싶은 제목, 관련 글감, 핵심 문장, 정리된 글, and 건네는 말.
+- Use 서로 가리키기: the 글 묶음 should point to related 글감, and the 글감 should point back to 이어진 글 묶음.
 - The 정리된 글 should reach 읽히는 상태 for 생각 있는 일반 독자.
 - Title work matters: 제목도 같이 잡기, and avoid clickbait.
 - 건네는 말 should be 제목이 못 하는 말: why this is being handed to someone now.
