@@ -14,3 +14,7 @@ It is built around a 글 정리 대화상대: a place to leave 덜 정리돼도 
 글감 남기기 -> 캐묻기 -> 함께 모양잡기 -> 글로 정리하기 -> 다듬기 -> 건네는 말 만들기
 
 The work does not fail when it stops early. 멈춰도 남는다.
+
+## Codex Skill
+
+This project has a local workflow skill at `.codex/skills/write-anything-workflow/SKILL.md`.
