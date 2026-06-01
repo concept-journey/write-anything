@@ -6,6 +6,24 @@ Curated visual styles for Frontend Slides. Each preset is inspired by real desig
 
 ---
 
+## Project Styles
+
+### Simple Large Progressive
+
+**Vibe:** Simple, readable, speaker-led, calm
+
+**Use for:** Korean internal talks that need large fonts, gentle slide transitions, and step-by-step reveals controlled by arrow keys.
+
+**Details:** See [styles/simple-large-progressive.md](styles/simple-large-progressive.md).
+
+**Layout:** One central statement per slide. At most three columns or two rows. Separated parts use `data-step` and appear one at a time.
+
+**Typography:** `IBM Plex Sans KR` from Google Fonts.
+
+**Colors:** Warm white, near-black charcoal, restrained red-orange accent.
+
+---
+
 ## Dark Themes
 
 ### 1. Bold Signal

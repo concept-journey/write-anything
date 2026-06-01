@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나는 왜 AI와 일하는 것이 불편할까</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23f8faf5'/%3E%3Crect x='7' y='7' width='18' height='18' fill='%23d34f2f'/%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ===========================================
+           CSS CUSTOM PROPERTIES (THEME)
+           Project style: Simple Large Progressive
+           =========================================== */
+        :root {
+            --stage-bg: #e9ece6;
+            --slide-bg: #f8faf5;
+            --ink: #171a18;
+            --muted: #626962;
+            --soft: #dfe5dc;
+            --soft-strong: #cbd4c8;
+            --accent: #d34f2f;
+            --accent-dark: #a9361f;
+            --accent-soft: #f1d5ca;
+            --focus: #2d6f5f;
+            --font-display: "IBM Plex Sans KR", sans-serif;
+            --font-body: "IBM Plex Sans KR", sans-serif;
+            --ease: cubic-bezier(0.16, 1, 0.3, 1);
+            --slide-duration: 360ms;
+            --step-duration: 280ms;
+        }
+
+        /* ===========================================
+           BASE RESET
+           =========================================== */
+        * {
+            box-sizing: border-box;
+        }
+
+        /* ===========================================
+           FIXED 16:9 STAGE: MANDATORY BASE STYLES
+           Include this ENTIRE file in every presentation.
+           Slides are authored at 1920x1080 and scaled as a whole.
+           =========================================== */
+
+        /* 1. Lock the browser viewport */
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            background: var(--stage-bg, #000);
+        }
+
+        /* 2. Full-window deck viewport */
+        .deck-viewport {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            background: var(--stage-bg, #000);
+        }
+
+        /* 3. Fixed 16:9 design canvas.
+           JavaScript sets transform: translate(...) scale(...). */
+        .deck-stage {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            transform-origin: 0 0;
+            background: var(--slide-bg, #fff);
+        }
+
+        /* 4. Slides stack inside the fixed stage.
+           Content must be laid out at 1920x1080, not reflowed per device. */
+        .slide {
+            position: absolute;
+            inset: 0;
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            display: block;
+            visibility: hidden;
+            opacity: 0;
+            pointer-events: none;
+            background: var(--slide-bg, #fff);
+        }
+
+        .slide.active,
+        .slide.visible {
+            visibility: visible;
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 1;
+        }
+
+        /* 5. Keep media inside authored slide bounds */
+        img,
+        video,
+        canvas,
+        svg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        /* 6. Presentation chrome stays outside the slide design system */
+        .deck-controls {
+            position: fixed;
+            left: 50%;
+            bottom: 22px;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+
+        /* 7. Print one fixed-size slide per page */
+        @media print {
+            html,
+            body {
+                width: 1920px;
+                height: auto;
+                overflow: visible;
+                background: #fff;
+            }
+
+            .deck-viewport {
+                position: static;
+                overflow: visible;
+                background: #fff;
+            }
+
+            .deck-stage {
+                position: static;
+                width: auto;
+                height: auto;
+                transform: none !important;
+                background: none;
+            }
+
+            .slide {
+                position: relative;
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                pointer-events: auto !important;
+                width: 1920px;
+                height: 1080px;
+                break-after: page;
+                page-break-after: always;
+            }
+
+            .slide:last-child {
+                break-after: auto;
+                page-break-after: auto;
+            }
+
+            .deck-controls {
+                display: none !important;
+            }
+        }
+
+        /* 8. Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.2s !important;
+            }
+        }
+
+        /* ===========================================
+           SLIDE TRANSITIONS
+           Weak, calm transitions between full slides.
+           =========================================== */
+        .slide {
+            font-family: var(--font-body);
+            color: var(--ink);
+            transform: translateX(20px);
+            transition:
+                opacity var(--slide-duration) var(--ease),
+                transform var(--slide-duration) var(--ease),
+                visibility 0ms linear var(--slide-duration);
+        }
+
+        .slide.active,
+        .slide.visible {
+            transform: translateX(0);
+            transition:
+                opacity var(--slide-duration) var(--ease),
+                transform var(--slide-duration) var(--ease),
+                visibility 0ms;
+        }
+
+        /* ===========================================
+           TYPOGRAPHY
+           Large Korean-friendly type with strict line wrapping.
+           =========================================== */
+        .slide,
+        .slide * {
+            word-break: keep-all;
+            overflow-wrap: break-word;
+            line-break: strict;
+            letter-spacing: 0;
+        }
+
+        .slide-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            padding: 82px 104px 92px;
+            display: grid;
+            grid-template-rows: 54px 1fr 58px;
+            gap: 28px;
+        }
+
+        .kicker {
+            margin: 0;
+            font-size: 27px;
+            font-weight: 600;
+            color: var(--accent-dark);
+        }
+
+        h1,
+        h2,
+        p {
+            margin: 0;
+        }
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: 124px;
+            line-height: 1.19;
+            font-weight: 700;
+            text-wrap: balance;
+        }
+
+        h2 {
+            font-family: var(--font-display);
+            font-size: 92px;
+            line-height: 1.22;
+            font-weight: 700;
+            text-wrap: balance;
+        }
+
+        .headline {
+            max-width: 1430px;
+        }
+
+        .statement {
+            font-size: 106px;
+            line-height: 1.24;
+            font-weight: 700;
+            text-wrap: balance;
+        }
+
+        .subline {
+            font-size: 52px;
+            line-height: 1.42;
+            font-weight: 500;
+            color: var(--muted);
+            text-wrap: pretty;
+        }
+
+        .accent {
+            color: var(--accent);
+        }
+
+        .small-note {
+            font-size: 25px;
+            font-weight: 600;
+            color: var(--muted);
+        }
+
+        code {
+            font-family: var(--font-body);
+            font-weight: 700;
+            color: var(--accent-dark);
+        }
+
+        /* ===========================================
+           LAYOUT SYSTEM
+           Max three columns or two rows per slide.
+           =========================================== */
+        .content {
+            grid-row: 2;
+            align-self: stretch;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 52px;
+        }
+
+        .cover-slide .slide-inner {
+            grid-template-rows: 1fr;
+            padding: 108px 124px;
+        }
+
+        .cover-slide .content {
+            grid-row: 1;
+            justify-content: center;
+            gap: 76px;
+        }
+
+        .cover-slide .headline {
+            max-width: 1520px;
+            font-size: 132px;
+        }
+
+        .statement-only .slide-inner {
+            grid-template-rows: 1fr;
+        }
+
+        .statement-only .content {
+            grid-row: 1;
+            align-items: center;
+            text-align: center;
+        }
+
+        .center {
+            align-items: center;
+            text-align: center;
+        }
+
+        .split-2 {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 34px;
+            align-items: stretch;
+        }
+
+        .grid-3x2 {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-rows: repeat(2, minmax(168px, auto));
+            gap: 26px;
+        }
+
+        .grid-2x2 {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-rows: repeat(2, minmax(185px, auto));
+            gap: 28px;
+        }
+
+        .tile {
+            min-height: 168px;
+            border: 2px solid var(--soft-strong);
+            border-radius: 0;
+            padding: 36px 38px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 14px;
+            background: rgba(255, 255, 255, 0.46);
+        }
+
+        .tile strong {
+            display: block;
+            font-size: 48px;
+            line-height: 1.24;
+            font-weight: 700;
+        }
+
+        .tile span {
+            display: block;
+            font-size: 33px;
+            line-height: 1.3;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .big-list {
+            display: grid;
+            gap: 20px;
+        }
+
+        .big-list .row {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            min-height: 88px;
+            font-size: 54px;
+            line-height: 1.2;
+            font-weight: 600;
+        }
+
+        .row::before {
+            content: "";
+            width: 18px;
+            height: 18px;
+            flex: 0 0 auto;
+            background: var(--accent);
+        }
+
+        .question-pair {
+            display: grid;
+            grid-template-columns: minmax(0, 0.95fr) 88px minmax(0, 1.05fr);
+            gap: 34px;
+            align-items: center;
+        }
+
+        .question-box {
+            min-height: 386px;
+            border-top: 8px solid var(--ink);
+            padding-top: 34px;
+        }
+
+        .question-box .label {
+            font-size: 27px;
+            font-weight: 700;
+            color: var(--muted);
+            margin-bottom: 28px;
+        }
+
+        .question-box .text {
+            font-size: 68px;
+            line-height: 1.18;
+            font-weight: 700;
+        }
+
+        .arrow-mark {
+            font-size: 82px;
+            color: var(--accent);
+            text-align: center;
+            font-weight: 700;
+        }
+
+        /* ===========================================
+           PROGRESSIVE DISCLOSURE
+           Same-slide parts are controlled by arrow keys.
+           =========================================== */
+        [data-step] {
+            opacity: 0;
+            transform: translateY(16px);
+            filter: blur(2px);
+            transition:
+                opacity var(--step-duration) var(--ease),
+                transform var(--step-duration) var(--ease),
+                filter var(--step-duration) var(--ease);
+            will-change: opacity, transform;
+        }
+
+        [data-step].is-visible {
+            opacity: 1;
+            transform: translateY(0);
+            filter: blur(0);
+        }
+
+        /* ===========================================
+           INLINE EDITING
+           Hidden by default; hover top-left or press E.
+           =========================================== */
+        .edit-hotzone {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 82px;
+            height: 82px;
+            z-index: 10000;
+            cursor: pointer;
+        }
+
+        .edit-toggle,
+        .export-toggle {
+            position: fixed;
+            left: 18px;
+            z-index: 10001;
+            border: 1px solid rgba(23, 26, 24, 0.2);
+            background: rgba(248, 250, 245, 0.94);
+            color: var(--ink);
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 700;
+            padding: 10px 12px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 220ms var(--ease);
+        }
+
+        .edit-toggle {
+            top: 18px;
+        }
+
+        .export-toggle {
+            top: 60px;
+        }
+
+        .edit-toggle.show,
+        .edit-toggle.active,
+        .export-toggle.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        body.editing [data-editable] {
+            outline: 3px solid rgba(211, 79, 47, 0.48);
+            outline-offset: 8px;
+            cursor: text;
+        }
+
+        body.editing .slide.active [data-step] {
+            opacity: 1;
+            transform: none;
+            filter: none;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="deck-viewport">
+        <main class="deck-stage" id="deckStage" aria-label="나는 왜 AI와 일하는 것이 불편할까 발표자료">
+            <!-- Speaker note: 오늘 이야기는 AI가 좋은지 나쁜지에 대한 이야기가 아닙니다. AI가 꽤 쓸 만해졌기 때문에 생긴 불편함에 대한 이야기입니다. -->
+            <section class="slide cover-slide active" data-title="나는 왜 AI와 일하는 것이 불편할까">
+                <div class="slide-inner">
+                    <div class="content">
+                        <h1 class="headline" data-editable data-edit-id="s1-title">나는 왜 AI와<br>일하는 것이 불편할까</h1>
+                        <div class="split-2">
+                            <p class="subline" data-step="1" data-editable data-edit-id="s1-a">AI가 못해서가 아니라</p>
+                            <p class="subline accent" data-step="2" data-editable data-edit-id="s1-b">꽤 그럴듯해서 생긴 불편함</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Speaker note: 처음 AI에게 코드를 맡겼을 때는 꽤 좋아 보였습니다. 설명도 해주고, 방향도 제안하고, 구현도 빨랐습니다. -->
+            <section class="slide" data-title="처음에는 충분히 같이 일할 수 있을 것 같았습니다">
+                <div class="slide-inner">
+                    <p class="kicker" data-editable data-edit-id="s2-kicker">처음의 감각</p>
+                    <div class="content">
+                        <h2 data-editable data-edit-id="s2-title">처음에는 충분히<br>같이 일할 수 있을 것 같았습니다</h2>
+                        <div class="grid-3x2">
+                            <div class="tile" data-step="1" data-editable data-edit-id="s2-a"><strong>설명</strong><span>요청하면 정리해줍니다</span></div>
+                            <div class="tile" data-step="2" data-editable data-edit-id="s2-b"><strong>방향</strong><span>물으면 답을 줍니다</span></div>
+                            <div class="tile" data-step="3" data-editable data-edit-id="s2-c"><strong>구현</strong><span>간단한 것은 빠르게 만듭니다</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Speaker note: 실제 코드베이스 안에서 결과를 계속 쓰다 보니 질문이 달라졌습니다. -->
+            <section class="slide" data-title="그런데 질문이 바뀌었습니다">
+                <div class="slide-inner">
+                    <p class="kicker" data-editable data-edit-id="s3-kicker">질문의 이동</p>
+                    <div class="content">
+                        <h2 data-editable data-edit-id="s3-title">그런데 질문이 바뀌었습니다</h2>
+                        <div class="question-pair">
+                            <div class="question-box" data-step="1">
+                                <p class="label" data-editable data-edit-id="s3-left-label">처음 질문</p>
+                                <p class="text" data-editable data-edit-id="s3-left">AI가 결과를<br>낼 수 있느냐?</p>
+                            </div>
+                            <div class="arrow-mark" data-step="2" aria-hidden="true">→</div>
+                            <div class="question-box" data-step="2">
+                                <p class="label" data-editable data-edit-id="s3-right-label">바뀐 질문</p>
+                                <p class="text" data-editable data-edit-id="s3-right">이 Jira를 AI와<br>어떤 순서로<br>소화해야 하지?</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Speaker note: AI와 이야기하면 정보가 많이 나옵니다. 말은 풍성해지는데, 그만큼 결정해야 할 것도 늘어납니다. -->
+            <section class="slide" data-title="흐름이 제어되지 않는다는 감각">
+                <div class="slide-inner">
+                    <p class="kicker" data-editable data-edit-id="s4-kicker">불편함의 정체</p>
+                    <div class="content">
+                        <h2 data-editable data-edit-id="s4-title">불편했던 것은<br>흐름이 제어되지 않는다는 감각이었습니다</h2>
+                        <div class="grid-2x2">
+                            <div class="tile" data-step="1" data-editable data-edit-id="s4-a"><strong>원인</strong><span>가능한 원인이 나옵니다</span></div>
+                            <div class="tile" data-step="2" data-editable data-edit-id="s4-b"><strong>방향</strong><span>수정 방향이 나옵니다</span></div>
+                            <div class="tile" data-step="3" data-editable data-edit-id="s4-c"><strong>파일</strong><span>같이 볼 파일이 나옵니다</span></div>
+                            <div class="tile" data-step="4" data-editable data-edit-id="s4-d"><strong>개선점</strong><span>나중에 할 일도 나옵니다</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Speaker note: 어느 순간 제가 일을 끌고 가는 것이 아니라, AI가 만든 갈래를 따라 어딘가에 놓여 있는 느낌이 듭니다. -->
+            <section class="slide" data-title="제가 일을 끌고 가는지 헷갈립니다">
+                <div class="slide-inner">
+                    <p class="kicker" data-editable data-edit-id="s5-kicker">흐름의 상실</p>
+                    <div class="content">
+                        <h2 data-editable data-edit-id="s5-title">어느 순간 제가 일을<br>끌고 가는지 헷갈립니다</h2>
+                        <div class="big-list">
+                            <p class="row" data-step="1" data-editable data-edit-id="s5-a">처음 잡고 있던 업무가 갈라집니다</p>
+                            <p class="row" data-step="2" data-editable data-edit-id="s5-b">갈래를 따라가다 보면 중심이 흐려집니다</p>
+                            <p class="row" data-step="3" data-editable data-edit-id="s5-c">결과는 그럴듯한데 흐름이 보이지 않습니다</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Speaker note: 지금 필요한 것은 더 많은 답이 아니라, 먼저 붙잡아야 할 작업의 흐름입니다. -->
+            <section class="slide" data-title="지금 필요한 것은 더 많은 답이 아닐 수 있습니다">
+                <div class="slide-inner">
+                    <p class="kicker" data-editable data-edit-id="s6-kicker">중간 결론</p>
+                    <div class="content center">
+                        <div>
+                            <p class="statement" data-editable data-edit-id="s6-a">지금 필요한 것은</p>
+                            <p class="statement accent" data-editable data-edit-id="s6-b">더 많은 답이 아니라,</p>
+                            <p class="statement" data-editable data-edit-id="s6-c">먼저 붙잡아야 할<br>작업의 흐름입니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Speaker note: 이 업무의 의도가 무엇인지 분명히 하고 관리 가능한 작업의 순서를 정해두는 일이 먼저 필요했습니다. -->
+            <section class="slide statement-only" data-title="최소한 필요한 것은 작업의 순서입니다">
+                <div class="slide-inner">
+                    <div class="content center">
+                        <p class="statement" data-editable data-edit-id="s7-title">필요한 것은<br>최소한의 작업 순서입니다.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Speaker note: 순서가 없으면 AI는 빠르게 움직이지만 저는 느리게 끌려갑니다. -->
+            <section class="slide" data-title="순서가 없으면 AI는 빠르고, 저는 느리게 끌려갑니다">
+                <div class="slide-inner">
+                    <p class="kicker" data-editable data-edit-id="s8-kicker">순서가 없을 때</p>
+                    <div class="content">
+                        <h2 data-editable data-edit-id="s8-title">순서가 없으면 AI는 빠르고,<br>저는 느리게 끌려갑니다</h2>
+                        <div class="grid-2x2">
+                            <div class="tile" data-step="1" data-editable data-edit-id="s8-a"><strong>대화</strong><span>길어집니다</span></div>
+                            <div class="tile" data-step="2" data-editable data-edit-id="s8-b"><strong>다음 행동</strong><span>선명하지 않습니다</span></div>
+                            <div class="tile" data-step="3" data-editable data-edit-id="s8-c"><strong>이번 Jira</strong><span>어디까지 왔는지 흐려집니다</span></div>
+                            <div class="tile" data-step="4" data-editable data-edit-id="s8-d"><strong>다시 시작할 때</strong><span>시작점이 보이지 않습니다</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Speaker note: 같은 Jira처럼 보여도 실제로는 각 작업이 가진 위험과 기준과 예외가 다릅니다. -->
+            <section class="slide" data-title="같은 개발 업무라도 같은 순서로 처리할 수 없습니다">
+                <div class="slide-inner">
+                    <p class="kicker" data-editable data-edit-id="s9-kicker">업무마다 다른 순서</p>
+                    <div class="content">
+                        <h2 data-editable data-edit-id="s9-title">같은 개발 업무라도<br>같은 순서로 처리할 수 없습니다</h2>
+                        <div class="grid-3x2">
+                            <div class="tile" data-step="1" data-editable data-edit-id="s9-a"><strong>버그 수정</strong><span>재현 조건과 영향 범위</span></div>
+                            <div class="tile" data-step="2" data-editable data-edit-id="s9-b"><strong>새 기능 개발</strong><span>의도와 기존 구조와의 접점</span></div>
+                            <div class="tile" data-step="3" data-editable data-edit-id="s9-c"><strong>리팩터링</strong><span>바꾸지 말아야 할 동작과 경계</span></div>
+                            <div class="tile" data-step="4" data-editable data-edit-id="s9-d"><strong>테스트 보강</strong><span>무엇을 증명하려는지</span></div>
+                            <div class="tile" data-step="5" data-editable data-edit-id="s9-e"><strong>운영 이슈</strong><span>지금 막을 문제와 나중에 정리할 문제</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Speaker note: AI를 다루는 능력과 기존 코드베이스를 이해하는 능력은 서로 다른 두 개의 지렛대입니다. -->
+            <section class="slide" data-title="두 개의 지렛대">
+                <div class="slide-inner">
+                    <p class="kicker" data-editable data-edit-id="s10-kicker">두 개의 지렛대</p>
+                    <div class="content">
+                        <h2 data-editable data-edit-id="s10-title">AI 사용법과 기존 업무 감각은<br>두 개의 지렛대입니다</h2>
+                        <div class="split-2">
+                            <div class="tile" data-step="1" data-editable data-edit-id="s10-a"><strong>AI를 다루는 능력</strong><span>코드베이스와 업무 맥락을 더 빨리 배울 수 있습니다</span></div>
+                            <div class="tile" data-step="2" data-editable data-edit-id="s10-b"><strong>기존 코드베이스를 이해하는 능력</strong><span>AI에게 더 정확한 순서와 경계를 줄 수 있습니다</span></div>
+                        </div>
+                        <p class="subline accent" data-step="3" data-editable data-edit-id="s10-c">둘이 만나는 자리에서 순서가 필요합니다</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Speaker note: 저는 요즘 업무를 시작할 때 작업의 흐름을 먼저 만들려고 합니다. -->
+            <section class="slide" data-title="제가 실제로 흐름을 붙잡는 방식">
+                <div class="slide-inner">
+                    <p class="kicker" data-editable data-edit-id="s11-kicker">제가 쓰는 방식</p>
+                    <div class="content">
+                        <h2 data-editable data-edit-id="s11-title">제가 실제로 흐름을<br>붙잡는 방식</h2>
+                        <div class="grid-3x2">
+                            <div class="tile" data-step="1" data-editable data-edit-id="s11-a"><strong>Task 폴더</strong><span>하나의 Task를 한 자리에서 처리합니다</span></div>
+                            <div class="tile" data-step="2" data-editable data-edit-id="s11-b"><strong><code>/grill-with-docs</code></strong><span>문제와 문맥을 확인합니다</span></div>
+                            <div class="tile" data-step="3" data-editable data-edit-id="s11-c"><strong><code>/to-prd</code></strong><span>요구와 판단을 정리합니다</span></div>
+                            <div class="tile" data-step="4" data-editable data-edit-id="s11-d"><strong><code>/to-issues</code></strong><span>작업 단위를 나눕니다</span></div>
+                            <div class="tile" data-step="5" data-editable data-edit-id="s11-e"><strong><code>checkpoint</code></strong><span>갈래를 관리합니다</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Speaker note: 불편함은 뒤처졌다는 증거도, AI를 거부해야 한다는 신호도 아닐 수 있습니다. -->
+            <section class="slide" data-title="먼저 사람이 자기 일의 흐름을 붙잡아야 합니다">
+                <div class="slide-inner">
+                    <p class="kicker" data-editable data-edit-id="s14-kicker">불편함의 의미</p>
+                    <div class="content">
+                        <h2 data-editable data-edit-id="s14-title">AI와 함께 일하려면 먼저 사람이<br>자기 일의 흐름을 붙잡아야 합니다</h2>
+                        <div class="big-list">
+                            <p class="row" data-step="1" data-editable data-edit-id="s14-a">불편함은 뒤처졌다는 증거가 아닙니다</p>
+                            <p class="row" data-step="2" data-editable data-edit-id="s14-b">내가 일해온 순서와 판단을 다시 꺼내보라는 신호일 수 있습니다</p>
+                            <p class="row" data-step="3" data-editable data-edit-id="s14-c">흐름이 있어야 AI가 만든 답도 제자리를 찾습니다</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Speaker note: 흐름이 반복 가능해지면, 그때부터 자동화의 질문이 시작됩니다. -->
+            <section class="slide" data-title="그때 자동화의 질문이 시작됩니다">
+                <div class="slide-inner">
+                    <p class="kicker" data-editable data-edit-id="s15-kicker">자동화로 이어지는 조건</p>
+                    <div class="content">
+                        <h2 data-editable data-edit-id="s15-title">흐름이 반복 가능해지면,<br>그때 자동화의 질문이 시작됩니다</h2>
+                        <div class="grid-3x2">
+                            <div class="tile" data-step="1" data-editable data-edit-id="s15-a"><strong>먼저</strong><span>더 좋은 프롬프트보다</span></div>
+                            <div class="tile" data-step="2" data-editable data-edit-id="s15-b"><strong>필요한 것</strong><span>자기 업무에 맞는 최소한의 작업 순서</span></div>
+                            <div class="tile" data-step="3" data-editable data-edit-id="s15-c"><strong>그 다음</strong><span>자동화</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Speaker note: 오늘 이야기의 결론은 이 한 문장입니다. AI와 함께 일하려면 먼저 사람이 자기 일의 흐름을 붙잡아야 합니다. -->
+            <section class="slide" data-title="마무리">
+                <div class="slide-inner">
+                    <p class="kicker" data-editable data-edit-id="s16-kicker">마무리</p>
+                    <div class="content center">
+                        <div>
+                            <p class="statement" data-editable data-edit-id="s16-a">AI와 함께 일하려면</p>
+                            <p class="statement" data-editable data-edit-id="s16-b">먼저 사람이</p>
+                            <p class="statement accent" data-editable data-edit-id="s16-c">자기 일의 흐름을 붙잡아야 합니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="edit-hotzone" aria-hidden="true"></div>
+    <button class="edit-toggle" id="editToggle" title="Edit mode (E)" type="button">EDIT</button>
+    <button class="export-toggle" id="exportToggle" title="Save edited HTML (Ctrl+S)" type="button">SAVE</button>
+
+    <script>
+        /* ===========================================
+           SLIDE PRESENTATION CONTROLLER
+           Handles fixed-stage scaling, slide navigation, and fragments.
+           =========================================== */
+        class SlidePresentation {
+            constructor() {
+                this.slides = Array.from(document.querySelectorAll(".slide"));
+                this.stage = document.getElementById("deckStage");
+                this.currentSlide = 0;
+                this.currentStep = 0;
+                this.lastWheelAt = 0;
+                this.touchStartX = 0;
+                this.touchStartY = 0;
+                this.setupStageScale();
+                this.setupKeyboardNav();
+                this.setupTouchNav();
+                this.setupWheelNav();
+                this.showSlide(0, 0);
+            }
+
+            setupStageScale() {
+                const scale = () => {
+                    const factor = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+                    const x = (window.innerWidth - 1920 * factor) / 2;
+                    const y = (window.innerHeight - 1080 * factor) / 2;
+                    this.stage.style.transform = `translate(${x}px, ${y}px) scale(${factor})`;
+                };
+                scale();
+                window.addEventListener("resize", scale);
+            }
+
+            setupKeyboardNav() {
+                document.addEventListener("keydown", (event) => {
+                    const isEditingText = event.target && event.target.getAttribute("contenteditable") === "true";
+                    if (isEditingText) return;
+
+                    if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " " || event.key === "Enter") {
+                        event.preventDefault();
+                        this.next();
+                    }
+
+                    if (event.key === "ArrowLeft" || event.key === "PageUp" || event.key === "Backspace") {
+                        event.preventDefault();
+                        this.previous();
+                    }
+
+                    if (event.key === "Home") {
+                        event.preventDefault();
+                        this.showSlide(0, 0);
+                    }
+
+                    if (event.key === "End") {
+                        event.preventDefault();
+                        this.showSlide(this.slides.length - 1, this.getMaxStep(this.slides[this.slides.length - 1]));
+                    }
+                });
+            }
+
+            setupTouchNav() {
+                document.addEventListener("touchstart", (event) => {
+                    const touch = event.changedTouches[0];
+                    this.touchStartX = touch.clientX;
+                    this.touchStartY = touch.clientY;
+                }, { passive: true });
+
+                document.addEventListener("touchend", (event) => {
+                    const touch = event.changedTouches[0];
+                    const dx = touch.clientX - this.touchStartX;
+                    const dy = touch.clientY - this.touchStartY;
+                    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy)) return;
+                    if (dx < 0) this.next();
+                    else this.previous();
+                }, { passive: true });
+            }
+
+            setupWheelNav() {
+                document.addEventListener("wheel", (event) => {
+                    const now = Date.now();
+                    if (now - this.lastWheelAt < 520) return;
+                    if (Math.abs(event.deltaY) < 22) return;
+                    this.lastWheelAt = now;
+                    if (event.deltaY > 0) this.next();
+                    else this.previous();
+                }, { passive: true });
+            }
+
+            getMaxStep(slide) {
+                const steps = Array.from(slide.querySelectorAll("[data-step]")).map((el) => Number(el.dataset.step || 0));
+                return steps.length ? Math.max(...steps) : 0;
+            }
+
+            updateFragments() {
+                const slide = this.slides[this.currentSlide];
+                slide.querySelectorAll("[data-step]").forEach((el) => {
+                    const step = Number(el.dataset.step || 0);
+                    el.classList.toggle("is-visible", step <= this.currentStep);
+                });
+            }
+
+            showSlide(index, step = 0) {
+                const nextIndex = Math.max(0, Math.min(index, this.slides.length - 1));
+                this.currentSlide = nextIndex;
+                const maxStep = this.getMaxStep(this.slides[nextIndex]);
+                this.currentStep = Math.max(0, Math.min(step, maxStep));
+
+                this.slides.forEach((slide, i) => {
+                    const active = i === this.currentSlide;
+                    slide.classList.toggle("active", active);
+                    slide.classList.toggle("visible", active);
+                    if (!active) {
+                        slide.querySelectorAll("[data-step]").forEach((el) => el.classList.remove("is-visible"));
+                    }
+                });
+
+                this.updateFragments();
+            }
+
+            next() {
+                const maxStep = this.getMaxStep(this.slides[this.currentSlide]);
+                if (this.currentStep < maxStep) {
+                    this.currentStep += 1;
+                    this.updateFragments();
+                    return;
+                }
+                this.showSlide(this.currentSlide + 1, 0);
+            }
+
+            previous() {
+                if (this.currentStep > 0) {
+                    this.currentStep -= 1;
+                    this.updateFragments();
+                    return;
+                }
+
+                const previousIndex = this.currentSlide - 1;
+                if (previousIndex < 0) return;
+                this.showSlide(previousIndex, this.getMaxStep(this.slides[previousIndex]));
+            }
+        }
+
+        /* ===========================================
+           INLINE EDITOR
+           Allows quick local text edits and localStorage persistence.
+           =========================================== */
+        class InlineEditor {
+            constructor() {
+                this.isActive = false;
+                this.storageKey = "ai-work-discomfort-internal-talk-edits";
+                this.editables = Array.from(document.querySelectorAll("[data-editable]"));
+                this.toggleButton = document.getElementById("editToggle");
+                this.exportButton = document.getElementById("exportToggle");
+                this.hotzone = document.querySelector(".edit-hotzone");
+                this.hideTimeout = null;
+                this.load();
+                this.setupControls();
+                this.setupEditing();
+            }
+
+            setupControls() {
+                this.toggleButton.addEventListener("click", () => this.toggleEditMode());
+                this.exportButton.addEventListener("click", () => this.downloadHtml());
+
+                this.hotzone.addEventListener("mouseenter", () => this.showButtons());
+                this.hotzone.addEventListener("mouseleave", () => this.scheduleHide());
+                this.hotzone.addEventListener("click", () => this.toggleEditMode());
+
+                [this.toggleButton, this.exportButton].forEach((button) => {
+                    button.addEventListener("mouseenter", () => this.showButtons());
+                    button.addEventListener("mouseleave", () => this.scheduleHide());
+                });
+
+                document.addEventListener("keydown", (event) => {
+                    const isEditingText = event.target && event.target.getAttribute("contenteditable") === "true";
+                    if ((event.key === "e" || event.key === "E") && !isEditingText) {
+                        event.preventDefault();
+                        this.toggleEditMode();
+                    }
+
+                    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "s") {
+                        event.preventDefault();
+                        this.save();
+                        this.downloadHtml();
+                    }
+                });
+            }
+
+            setupEditing() {
+                this.editables.forEach((element) => {
+                    element.addEventListener("input", () => this.save());
+                    element.addEventListener("blur", () => this.save());
+                });
+            }
+
+            showButtons() {
+                clearTimeout(this.hideTimeout);
+                this.toggleButton.classList.add("show");
+                if (this.isActive) this.exportButton.classList.add("show");
+            }
+
+            scheduleHide() {
+                this.hideTimeout = setTimeout(() => {
+                    if (!this.isActive) {
+                        this.toggleButton.classList.remove("show");
+                        this.exportButton.classList.remove("show");
+                    }
+                }, 400);
+            }
+
+            toggleEditMode() {
+                this.isActive = !this.isActive;
+                document.body.classList.toggle("editing", this.isActive);
+                this.toggleButton.classList.toggle("active", this.isActive);
+                this.exportButton.classList.toggle("show", this.isActive);
+                this.editables.forEach((element) => {
+                    element.setAttribute("contenteditable", this.isActive ? "true" : "false");
+                });
+                if (!this.isActive) this.save();
+            }
+
+            load() {
+                const saved = localStorage.getItem(this.storageKey);
+                if (!saved) return;
+                try {
+                    const values = JSON.parse(saved);
+                    this.editables.forEach((element) => {
+                        const id = element.dataset.editId;
+                        if (id && Object.prototype.hasOwnProperty.call(values, id)) {
+                            element.innerHTML = values[id];
+                        }
+                    });
+                } catch {
+                    localStorage.removeItem(this.storageKey);
+                }
+            }
+
+            save() {
+                const values = {};
+                this.editables.forEach((element) => {
+                    const id = element.dataset.editId;
+                    if (id) values[id] = element.innerHTML;
+                });
+                localStorage.setItem(this.storageKey, JSON.stringify(values));
+            }
+
+            downloadHtml() {
+                this.save();
+                const clone = document.documentElement.cloneNode(true);
+                clone.querySelectorAll("[contenteditable]").forEach((element) => element.setAttribute("contenteditable", "false"));
+                clone.querySelectorAll(".is-visible").forEach((element) => element.classList.remove("is-visible"));
+                clone.querySelector("body").classList.remove("editing");
+                const html = "<!DOCTYPE html>\n" + clone.outerHTML;
+                const blob = new Blob([html], { type: "text/html" });
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = "2026-06-01-ai-work-discomfort-internal-talk-edited.html";
+                link.click();
+                URL.revokeObjectURL(link.href);
+            }
+        }
+
+        /* ===========================================
+           BOOTSTRAP
+           =========================================== */
+        const deck = new SlidePresentation();
+        const editor = new InlineEditor();
+        window.deck = deck;
+        window.editor = editor;
+    </script>
+</body>
+</html>
