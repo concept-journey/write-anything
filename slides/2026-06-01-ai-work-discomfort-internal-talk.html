@@ -632,38 +632,20 @@
                 </div>
             </section>
 
-            <!-- Speaker note: 같은 Jira처럼 보여도 실제로는 각 작업이 가진 위험과 기준과 예외가 다릅니다. -->
-            <section class="slide" data-title="같은 개발 업무라도 같은 순서로 처리할 수 없습니다">
+            <!-- Speaker note: AI와 일하는 순서는 AI 사용법에서만 나오는 것이 아니라, 제가 원래 일을 어떤 기준으로 해왔는지에서 나옵니다. -->
+            <section class="slide" data-title="AI와 일하는 순서는 내가 하던 업무 감각에서 나옵니다">
                 <div class="slide-inner">
-                    <p class="kicker" data-editable data-edit-id="s9-kicker">업무마다 다른 순서</p>
+                    <p class="kicker" data-editable data-edit-id="s9-kicker">업무 감각 꺼내기</p>
                     <div class="content">
-                        <h2 data-editable data-edit-id="s9-title">같은 개발 업무라도<br>같은 순서로 처리할 수 없습니다</h2>
-                        <div class="grid-3x2">
-                            <div class="tile" data-step="1" data-editable data-edit-id="s9-a"><strong>버그 수정</strong><span>재현 조건과 영향 범위</span></div>
-                            <div class="tile" data-step="2" data-editable data-edit-id="s9-b"><strong>새 기능 개발</strong><span>의도와 기존 구조와의 접점</span></div>
-                            <div class="tile" data-step="3" data-editable data-edit-id="s9-c"><strong>리팩터링</strong><span>바꾸지 말아야 할 동작과 경계</span></div>
-                            <div class="tile" data-step="4" data-editable data-edit-id="s9-d"><strong>테스트 보강</strong><span>무엇을 증명하려는지</span></div>
-                            <div class="tile" data-step="5" data-editable data-edit-id="s9-e"><strong>운영 이슈</strong><span>지금 막을 문제와 나중에 정리할 문제</span></div>
+                        <h2 data-editable data-edit-id="s9-title">AI와 일하는 순서는<br>내가 하던 업무 감각에서 나옵니다</h2>
+                        <div class="big-list">
+                            <p class="row" data-step="1" data-editable data-edit-id="s9-a">버그 수정과 새 기능은 먼저 볼 것이 다릅니다</p>
+                            <p class="row" data-step="2" data-editable data-edit-id="s9-b">리팩터링과 테스트 보강도 기준이 다릅니다</p>
+                            <p class="row" data-step="3" data-editable data-edit-id="s9-c">그 기준을 말로 꺼내야 흐름이 보입니다</p>
                         </div>
                     </div>
                 </div>
             </section>
-
-            <!-- Speaker note: AI를 다루는 능력과 기존 코드베이스를 이해하는 능력은 서로 다른 두 개의 지렛대입니다. -->
-            <section class="slide" data-title="두 개의 지렛대">
-                <div class="slide-inner">
-                    <p class="kicker" data-editable data-edit-id="s10-kicker">두 개의 지렛대</p>
-                    <div class="content">
-                        <h2 data-editable data-edit-id="s10-title">AI 사용법과 기존 업무 감각은<br>두 개의 지렛대입니다</h2>
-                        <div class="split-2">
-                            <div class="tile" data-step="1" data-editable data-edit-id="s10-a"><strong>AI를 다루는 능력</strong><span>코드베이스와 업무 맥락을 더 빨리 배울 수 있습니다</span></div>
-                            <div class="tile" data-step="2" data-editable data-edit-id="s10-b"><strong>기존 코드베이스를 이해하는 능력</strong><span>AI에게 더 정확한 순서와 경계를 줄 수 있습니다</span></div>
-                        </div>
-                        <p class="subline accent" data-step="3" data-editable data-edit-id="s10-c">둘이 만나는 자리에서 순서가 필요합니다</p>
-                    </div>
-                </div>
-            </section>
-
             <!-- Speaker note: 저는 요즘 업무를 시작할 때 작업의 흐름을 먼저 만들려고 합니다. -->
             <section class="slide" data-title="제가 실제로 흐름을 붙잡는 방식">
                 <div class="slide-inner">
@@ -879,7 +861,7 @@
         class InlineEditor {
             constructor() {
                 this.isActive = false;
-                this.storageKey = "ai-work-discomfort-internal-talk-edits";
+                this.storageKey = "ai-work-discomfort-internal-talk-edits-v2";
                 this.editables = Array.from(document.querySelectorAll("[data-editable]"));
                 this.toggleButton = document.getElementById("editToggle");
                 this.exportButton = document.getElementById("exportToggle");
